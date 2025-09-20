@@ -5,13 +5,9 @@ module Acc_reg (
         output logic [7:0] data_out
 );
         always_ff @(posedge clk & posedge rst)begin
-            if (rst)
-            data_out <= 8'b0;
-        else if(load)
-        begin
-            if(control) data_out <= data_mem ;
-            else data_out <= data_alu ;
+                if (rst)
+                data_out <= 8'b0;
+                else if(load)
+                data_out <= control ? data_mem : data_alu;
         end
-    end
-
 endmodule
