@@ -1,19 +1,21 @@
 module ALU (
-        input logic [8:0] rs1, rs2,
-        input logic [1:0] control,
-        output logic [8:0] rd
+    input  logic [7:0] rs1, rs2,
+    input  logic [1:0] control,
+    input  logic [3:0] opcode,
+    output logic [7:0] rd,
+    output logic      is_zero
 );
-    logic [7:0] a_nd, x_or, add ;
 
-    assign a_nd = rs1 & rs2 ;
-    assign x_or = rs1 ^ rs2 ;
-
-    frefixadder_8bit adder (.A(rs1), .B(rs2), .cin(0), .G0(a_nd), .P0(x_or), .sum(add), .cout(0)) ;
-
-    always_comb
-    begin
-        if(control[1] == 0) rd = x_or ;
-        else if(control[0] == 0) rd = a_nd ;
-        else rd = add ;
+    always_comb begin
+        case (opcode)
+        3'b010: alu_out = in_a + in_b;
+        3'b011: alu_out = in_a & in_b;
+        3'b100: alu_out = in_a ^ in_b;
+        3'b101: alu_out = in_b;
+        default : alu_out = in_a;
+        endcase
     end
+
+    assign is_zero = (inA == 8'b0);
+
 endmodule
