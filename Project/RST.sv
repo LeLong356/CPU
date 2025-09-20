@@ -4,7 +4,7 @@ module Acc_reg (
         input logic load, control,
         output logic [7:0] data_out
 );
-        always_ff @(posedge clk & posedge rst)begin
+        always_ff @(posedge clk)begin
                 if (rst)
                 data_out <= 8'b0;
                 else if(load)
