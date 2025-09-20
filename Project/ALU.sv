@@ -1,7 +1,7 @@
 module ALU (
     input  logic [7:0] rs1, rs2,
     input  logic [1:0] control,
-    input  logic [3:0] opcode,
+    input  logic [2:0] opcode,
     output logic [7:0] rd,
     output logic      is_zero
 );
