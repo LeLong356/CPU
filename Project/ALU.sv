@@ -2,19 +2,14 @@ module ALU (
     input  logic [7:0] rs1, rs2,
     input  logic [2:0] opcode,
     output logic [7:0] rd,
-    output logic      is_zero
+    output logic is_zero
 );
-
+    logic [7:0] lut [0:7];
     always_comb begin
-        case (opcode)
-        3'b010: alu_out = in_a + in_b;
-        3'b011: alu_out = in_a & in_b;
-        3'b100: alu_out = in_a ^ in_b;
-        3'b101: alu_out = in_b;
-        default : alu_out = in_a;
-        endcase
+        lut[2] = rs1 + rs2; // 010
+        lut[3] = rs1 & rs2; //011
+        lut[4] = rs1 ^ rs2; //100
+        rd = lut[opcode];
     end
-
-    assign is_zero = (inA == 8'b0);
-
+    assign is_zero = ( rs1 == 0);
 endmodule
