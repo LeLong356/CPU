@@ -1,6 +1,7 @@
 module CONTROL (
         input [2:0] opcode,
         input logic clk, rst,
+        input is_zero,
         output logic pc_load, pc_en, halt,
         output logic accumulator_load, accumulator_control,
         output logic memIns_en, memDa_en, memDa_we,
@@ -30,7 +31,7 @@ module CONTROL (
         else state <= nextstate ;
     end
 
-    logic ACC_LOAD, STO, HALT, JMP, SKZ ;
+    logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
     always_comb
     begin
         ACC_LOAD = (opcode == 2 | opcode == 3 | opcode == 4 | opcode == 5) ;
@@ -45,7 +46,7 @@ module CONTROL (
     begin
         if(rst)
         begin
-            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ;
+            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= 0 ;
             accumulator_control <= 0 ; accumulator_load <= 0 ;
             memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= 0 ;
         end
@@ -53,31 +54,32 @@ module CONTROL (
         begin
             case (state)
             4'b0001 :    begin //Fetch
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ;
+                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= 0 ;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 1 ; memDa_en <= 0 ; memDa_we <= 0 ;
                         end
             4'b0010 :    begin //Decode
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ;
+                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= 0 ;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= 0 ;
                         end
             4'b0100 :    begin //Execute
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= HALT ;
+                            pc_load <= 0 ; pc_en <= 0 ; halt <= HALT ; jmp <= JMP ;
                             accumulator_control <= ACC_MEM ; accumulator_load <= ACC_LOAD ;
                             memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= STO ;
                         end
             4'b1000 :    begin //WriteBack
-                            pc_load <= (JMP | SKZ) ; pc_en <= 1 ; halt <= 0 ;
+                            pc_load <= JMP | (SKZ & is_zero) ; pc_en <= 1 ; halt <= 0 ; jmp <= JMP;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= 0 ;
                         end
             default :   begin // default <=> reset
-                            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ;
+                            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= 0 ;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= 0 ;
                         end
             endcase
         end
     end
+endmodule
 endmodule
