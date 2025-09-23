@@ -40,41 +40,27 @@ end
 
     always_ff @(posedge clk)
     begin
-        if(rst)
-        begin
-            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= 0 ;
-            accumulator_control <= 0 ; accumulator_load <= 0 ;
-            memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= 0 ;
-        end
-        else
-        begin
-            case (state)
+           case (state)
             4'b0001 :    begin //Fetch
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= 0 ;
+                            pc_load <= JMP | (SKZ & is_zero) ; pc_en <= 0 ; halt <= 0 ; jmp <= JMP ;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 1 ; memDa_en <= 0 ; memDa_we <= 0 ;
                         end
             4'b0010 :    begin //Decode
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= 0 ;
+                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= JMP ;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
-                            memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= 0 ;
+                            memIns_en <= 0 ; memDa_en <= 1 ; memDa_we <= 0 ;
                         end
             4'b0100 :    begin //Execute
                             pc_load <= 0 ; pc_en <= 0 ; halt <= HALT ; jmp <= JMP ;
                             accumulator_control <= ACC_MEM ; accumulator_load <= ACC_LOAD ;
-                            memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= STO ;
+                            memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= STO ;
                         end
             4'b1000 :    begin //WriteBack
-                            pc_load <= JMP | (SKZ & is_zero) ; pc_en <= 1 ; halt <= 0 ; jmp <= JMP;
-                            accumulator_control <= 0 ; accumulator_load <= 0 ;
-                            memIns_en <= 1 ; memDa_en <= 1 ; memDa_we <= 0 ;
-                        end
-            default :   begin // default <=> reset
-                            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= 0 ;
+                            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= JMP;
                             accumulator_control <= 0 ; accumulator_load <= 0 ;
                             memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= 0 ;
                         end
             endcase
-        end
     end
 endmodule
