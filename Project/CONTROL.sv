@@ -52,7 +52,7 @@ end
     
     always_comb begin
     if (rst) begin
-        pc_load = 0; pc_en = 0; halt = 0; jmp = 0;
+        pc_load = 0; pc_en = 1; halt = 0; jmp = 0;
         accumulator_control = 0; accumulator_load = 0;
         memIns_en = 0; memDa_en = 0; memDa_we = 0;
     end else begin
