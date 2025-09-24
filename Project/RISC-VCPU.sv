@@ -5,8 +5,8 @@ module RISC_VCPU (
     logic pc_load, pc_en, skz_addr, jmp_addr, jmp_control ;
     logic [4:0] pc_addr, addr_in;
     logic accumulator_control, accumulator_load ;
-    logic memIns_en, memDa_en, memDa_we ;
-    logic [7:0] acc_in, acc_out, alu_out, memDa_out, zero, ins;
+    logic memIns_en, memDa_en, memDa_we, zero ;
+    logic [7:0] acc_in, acc_out, alu_out, memDa_out, ins;
 
     PC counter (.clk(clk), .rst(rst), .load(pc_load), .en(pc_en),
                     .data_in(addr_in), .pc_count(pc_addr)) ;
