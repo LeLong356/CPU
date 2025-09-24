@@ -7,11 +7,12 @@ module CONTROL (
         output logic memIns_en, memDa_en, memDa_we,
         output logic jmp
 );
-    typedef enum logic [3:0] {
-                                s0 = 4'b0001, //fetch
-                                s1 = 4'b0010, //decode
-                                s2 = 4'b0100, //execute
-                                s3 = 4'b1000  //write back
+    typedef enum logic [3:0] {                                                  
+                                s0 = 4'b0000, // rst
+                                s1 = 4'b0001, //fetch
+                                s2 = 4'b0010, //decode
+                                s3 = 4'b0100, //execute
+                                s4 = 4'b1000  //write back
                             } statetype_e ;
     statetype_e state, nextstate ;
     always_comb begin
@@ -20,7 +21,7 @@ module CONTROL (
             s0: nextstate = s1;
             s1: nextstate = s2;
             s2: nextstate = s3;
-            s3: nextstate = s0;
+            s3: nextstate = s4;
             default: nextstate = s0;
         endcase
     end
