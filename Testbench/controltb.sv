@@ -37,13 +37,11 @@ module control_tb;
         rst = 0;
 
         // chạy thử vài opcode
-        run_opcode(3'b000);//Halt
-        rst = 1; #10;
-        rst = 0; 
-                       
+        run_opcode(3'b100);//Halt   ;      
         run_opcode(3'b010);  // SKZ
         run_opcode(3'b101); // ví dụ
         run_opcode(3'b111);// ví dụ
+        run_opcode(3'b000);
 
         $display("DONE SIMULATION");
         $finish;
@@ -52,12 +50,17 @@ module control_tb;
     task run_opcode(input [2:0] op);
         begin
             opcode = op;
-            repeat (5) begin
+            repeat (4) begin
                 @(posedge clk);
-                $display("t=%0t state=%0d opcode=%0b",
-                         $time, dut.state, opcode);
+               $display("t=%0t | state=%4b -> next=%4b | opcode=%b | is_zero=%b || pc_load=%b pc_en=%b halt=%b jmp=%b | acc_load=%b acc_ctrl=%b | memIns_en=%b memDa_en=%b memDa_we=%b",
+                 $time, dut.state, dut.nextstate,
+                 opcode, is_zero,
+                 pc_load, pc_en, halt, jmp,
+                 accumulator_load, accumulator_control,
+                 memIns_en, memDa_en, memDa_we);
             end
         end
     endtask
+    
 
 endmodule
