@@ -35,10 +35,10 @@ module control_tb;
         clk = 0; rst = 1; opcode = 3'b000; is_zero = 0;
         repeat (2) @(posedge clk); // giữ reset vài chu kỳ
         rst = 0;
-
+       
         // chạy thử vài opcode
-        run_opcode(3'b100);//Halt   ;      
-        run_opcode(3'b010);  // SKZ
+        run_opcode(3'b100);//Halt
+        run_opcode(3'b000);
         run_opcode(3'b101); // ví dụ
         run_opcode(3'b111);// ví dụ
         run_opcode(3'b000);
@@ -50,16 +50,13 @@ module control_tb;
     task run_opcode(input [2:0] op);
         begin
             opcode = op;
-            repeat (4) begin
-                @(posedge clk);
-               $display("t=%0t | state=%4b -> next=%4b | opcode=%b | is_zero=%b || pc_load=%b pc_en=%b halt=%b jmp=%b | acc_load=%b acc_ctrl=%b | memIns_en=%b memDa_en=%b memDa_we=%b",
-                 $time, dut.state, dut.nextstate,
-                 opcode, is_zero,
-                 pc_load, pc_en, halt, jmp,
-                 accumulator_load, accumulator_control,
-                 memIns_en, memDa_en, memDa_we);
+            repeat (4)@(posedge clk);
+           if (opcode == 3'b000) begin
+                    rst = 1;
+                    @(posedge clk);   // giữ rst trong ít nhất 1 cạnh clock
+                    rst = 0;
+                    end
             end
-        end
     endtask
     
 
