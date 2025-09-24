@@ -7,34 +7,38 @@ module CONTROL (
         output logic memIns_en, memDa_en, memDa_we,
         output logic jmp
 );
-    typedef enum logic [3:0] {                                                  
-                                s0 = 4'b0000, // rst
-                                s1 = 4'b0001, //fetch
-                                s2 = 4'b0010, //decode
-                                s3 = 4'b0100, //execute
-                                s4 = 4'b1000  //write back
-                            } statetype_e ;
-    statetype_e state, nextstate ;
+    typedef enum logic [2:0] {
+        s0 = 3'd0, // reset
+        s1 = 3'd1, // fetch
+        s2 = 3'd2, // decode
+        s3 = 3'd3, // execute
+        s4 = 3'd4  // writeback
+    } statetype_e;
+
+    statetype_e state, nextstate;
+
     always_comb begin
-    if(!halt) begin
-        case(state)
-            s0: nextstate = s1;
-            s1: nextstate = s2;
-            s2: nextstate = s3;
-            s3: nextstate = s4;
-            default: nextstate = s0;
-        endcase
+        if (!halt) begin
+            case (state)
+                s0: nextstate = s1;
+                s1: nextstate = s2;
+                s2: nextstate = s3;
+                s3: nextstate = s4;
+                s4: nextstate = s0;
+                default: nextstate = s0;
+            endcase
+        end else begin
+            nextstate = state; // giữ nguyên khi HALT
+        end
     end
-    else nextstate = state; // giữ nguyên khi halt
-end
-
-        always_ff @(posedge clk)
-    begin
-        if(rst) state <= s0 ;
-        else state <= nextstate ;
+    
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst)
+            state <= s0;
+        else
+            state <= nextstate;
     end
-
-
+    
     logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
     always_comb
     begin
@@ -46,28 +50,33 @@ end
         SKZ = (opcode == 2) ;
     end
 
-    always_ff @(posedge clk)
+    always_comb
     begin
            case (state)
-            4'b0001 :    begin //Fetch
-                            pc_load <= JMP | (SKZ & is_zero) ; pc_en <= 0 ; halt <= 0 ; jmp <= JMP ;
-                            accumulator_control <= 0 ; accumulator_load <= 0 ;
-                            memIns_en <= 1 ; memDa_en <= 0 ; memDa_we <= 0 ;
+            s1 :        begin //Fetch
+                            pc_load = JMP | (SKZ & is_zero) ; pc_en = 0 ; halt = 0 ; jmp = JMP ;
+                            accumulator_control = 0 ; accumulator_load = 0 ;
+                            memIns_en = 1 ; memDa_en = 0 ; memDa_we = 0 ;
                         end
-            4'b0010 :    begin //Decode
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= 0 ; jmp <= JMP ;
-                            accumulator_control <= 0 ; accumulator_load <= 0 ;
-                            memIns_en <= 0 ; memDa_en <= 1 ; memDa_we <= 0 ;
+            s2 :        begin //Decode
+                            pc_load = 0 ; pc_en = 0 ; halt = 0 ; jmp = JMP ;
+                            accumulator_control = 0 ; accumulator_load = 0 ;
+                            memIns_en = 0 ; memDa_en = 1 ; memDa_we = 0 ;
                         end
-            4'b0100 :    begin //Execute
-                            pc_load <= 0 ; pc_en <= 0 ; halt <= HALT ; jmp <= JMP ;
-                            accumulator_control <= ACC_MEM ; accumulator_load <= ACC_LOAD ;
-                            memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= STO ;
+            s3 :        begin //Execute
+                            pc_load = 0 ; pc_en = 0 ; halt = HALT ; jmp = JMP ;
+                            accumulator_control = ACC_MEM ; accumulator_load = ACC_LOAD ;
+                            memIns_en = 0 ; memDa_en = 0 ; memDa_we = STO ;
                         end
-            4'b1000 :    begin //WriteBack
-                            pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= JMP;
-                            accumulator_control <= 0 ; accumulator_load <= 0 ;
-                            memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= 0 ;
+            s4 :        begin //WriteBack
+                            pc_load = 0 ; pc_en = 1 ; halt = 0 ; jmp = JMP;
+                            accumulator_control = 0 ; accumulator_load = 0 ;
+                            memIns_en = 0 ; memDa_en = 0 ; memDa_we = 0 ;
+                        end
+            default:    begin
+                            pc_load = 0 ; pc_en = 0 ; halt = 0 ; jmp = 0 ;
+                            accumulator_control = 0 ; accumulator_load = 0 ;
+                            memIns_en = 0 ; memDa_en = 0 ; memDa_we = 0 ;
                         end
             endcase
     end
