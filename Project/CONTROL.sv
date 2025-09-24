@@ -27,6 +27,13 @@ module CONTROL (
     else nextstate = state; // giữ nguyên khi halt
 end
 
+        always_ff @(posedge clk)
+    begin
+        if(rst) state <= s0 ;
+        else state <= nextstate ;
+    end
+
+
     logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
     always_comb
     begin
