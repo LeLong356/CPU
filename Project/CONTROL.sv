@@ -7,30 +7,30 @@ module CONTROL (
         output logic memIns_en, memDa_en, memDa_we,
         output logic jmp
 );
-    typedef enum logic [2:0] {
-        s0 = 3'd0, // reset
-        s1 = 3'd1, // fetch
-        s2 = 3'd2, // decode
-        s3 = 3'd3, // execute
-        s4 = 3'd4  // writeback
+    typedef enum logic [4:0] {
+        s0 = 5'b00001, // reset
+        s1 = 5'b00010, // fetch
+        s2 = 5'b00100, // decode
+        s3 = 5'b01000, // execute
+        s4 = 5'b10000  // writeback
     } statetype_e;
 
     statetype_e state, nextstate;
 
     always_comb begin
-        if (!halt) begin
-            case (state)
-                s0: nextstate = s1;
-                s1: nextstate = s2;
-                s2: nextstate = s3;
-                s3: nextstate = s4;
-                s4: nextstate = s0;
-                default: nextstate = s0;
-            endcase
-        end else begin
-            nextstate = state; // giữ nguyên khi HALT
-        end
+    if (!halt) begin
+        case (state)
+            s0: nextstate = s1;
+            s1: nextstate = s2;
+            s2: nextstate = s3;
+            s3: nextstate = s4;
+            s4: nextstate = s0;
+            default: nextstate = s0;
+        endcase
+    end else begin
+        nextstate = state; // giữ nguyên khi halt
     end
+end
     
     always_ff @(posedge clk or posedge rst) begin
         if (rst)
