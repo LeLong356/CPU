@@ -54,7 +54,7 @@ end
             4'b0100 :    begin //Execute
                             pc_load <= 0 ; pc_en <= 0 ; halt <= HALT ; jmp <= JMP ;
                             accumulator_control <= ACC_MEM ; accumulator_load <= ACC_LOAD ;
-                            memIns_en <= 0 ; memDa_en <= 0 ; memDa_we <= STO ;
+                            memIns_en <= 0 ; memDa_en <= 1 ; memDa_we <= STO ;
                         end
             4'b1000 :    begin //WriteBack
                             pc_load <= 0 ; pc_en <= 1 ; halt <= 0 ; jmp <= JMP;
