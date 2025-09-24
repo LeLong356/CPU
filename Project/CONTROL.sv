@@ -29,9 +29,9 @@ module CONTROL (
         nextstate = state; // giữ nguyên khi halt
     end
 end
-    
 
-    
+
+
     logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
     always_comb
     begin
@@ -42,14 +42,12 @@ end
         JMP = (opcode == 7) ;
         SKZ = (opcode == 2) ;
     end
-    
-    always_ff @(posedge clk or posedge rst) begin
-    if (rst)
-        state <= s1;      // reset về FETCH
-    else
+
+    always_ff @(posedge clk) begin
+    if (!rst)
         state <= nextstate;
     end
-    
+
     always_comb begin
     if (rst) begin
         pc_load = 0; pc_en = 0; halt = 0; jmp = 0;
@@ -69,7 +67,7 @@ end
                 memIns_en = 1; memDa_en = 0; memDa_we = 0;
             end
             s3: begin // EXECUTE
-                pc_load = 0; pc_en = 0; halt = HALT; jmp = JMP;
+                pc_load = 0; pc_en = 0; halt = 0; jmp = JMP;
                 accumulator_control = 0; accumulator_load = 0;
                 memIns_en = 0; memDa_en = 1; memDa_we = 0;
             end
