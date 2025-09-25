@@ -60,20 +60,20 @@ end
     end else begin
         case (state)
             s1: begin // FETCH
-                pc_load = 0;
+					 pc_load = JMP | (SKZ & is_zero);
                 pc_en = 1; halt = 0; jmp = JMP;
                 accumulator_control = 0; accumulator_load = 0;
-                memIns_en = 0; memDa_en = 0; memDa_we = 0;
+                memIns_en = 1; memDa_en = 0; memDa_we = 0;
             end
             s2: begin // DECODE
-                pc_load = JMP | (SKZ & is_zero); pc_en = 0; halt = 0; jmp = JMP;
+                pc_load = 0; pc_en = 0; halt = 0; jmp = JMP;
                 accumulator_control = 0; accumulator_load = 0;
-                memIns_en = 1; memDa_en = 0; memDa_we = 0;
+                memIns_en = 0; memDa_en = 1; memDa_we = 0;
             end
             s3: begin // EXECUTE
                 pc_load = 0; pc_en = 0; halt = HALT; jmp = JMP;
                 accumulator_control = 0; accumulator_load = 0;
-                memIns_en = 0; memDa_en = 1; memDa_we = 0;
+                memIns_en = 0; memDa_en = 0; memDa_we = 0;
             end
             s4: begin // WRITEBACK
                 pc_load = 0; pc_en = 0; halt = HALT; jmp = JMP;
