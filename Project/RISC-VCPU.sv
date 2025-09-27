@@ -1,9 +1,9 @@
-module RISC_VCPU (
+module Combinational_Logic (
         input logic clk, rst,
         output logic HALT
 );
-    logic pc_load, pc_en, skz_addr, jmp_addr, jmp_control ;
-    logic [4:0] pc_addr, addr_in;
+    logic pc_load, pc_en, jmp_control ;
+    logic [4:0] pc_addr, addr_in, skz_addr ;
     logic accumulator_control, accumulator_load ;
     logic memIns_en, memDa_en, memDa_we, zero ;
     logic [7:0] acc_in, acc_out, alu_out, memDa_out, ins;
@@ -30,7 +30,7 @@ module RISC_VCPU (
     RST accumulator (.clk(clk), .rst(rst), .load(accumulator_load),
                             .data_in(acc_in), .data_out(acc_out)) ;
 
-  prefixadder SKZ (.A(pc_addr), .B(5'b00010), .Cin(1'b0),
+    prefixadder SKZ (.A(pc_addr), .B(5'b00010), .Cin(1'b0),
                         .Sum(skz_addr), .Cout()) ;
 
     mux_parameter #(.WIDTH(5)) muxAddr (.d0(skz_addr), .d1(ins[4:0]),
