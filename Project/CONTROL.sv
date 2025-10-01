@@ -17,26 +17,8 @@ module CONTROL (
 
     statetype_e state, nextstate;
 
-    logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
-    always_comb
-    begin
-        ACC_LOAD = (opcode == 2 | opcode == 3 | opcode == 4 | opcode == 5) ;
-        ACC_MEM = (opcode == 5) ;
-        STO = (opcode == 6) ;
-        HALT = (opcode == 0) ;
-        JMP = (opcode == 7) ;
-        SKZ = (opcode == 2) ;
-    end
-    
-    always_ff @(posedge clk or posedge rst) begin
-    if (rst)
-        state <= s0;      // reset về FETCH
-    else
-        state <= nextstate;
-    end
-    
     always_comb begin
-    if (!HALT) begin
+    if (!halt) begin
         case (state)
             s0: nextstate = s1;
             s1: nextstate = s2;
@@ -50,6 +32,26 @@ module CONTROL (
     end
 end
     
+
+    
+    logic ACC_LOAD, ACC_MEM, STO, HALT, JMP, SKZ ;
+    always_comb
+    begin
+        ACC_LOAD = (opcode == 2 | opcode == 3 | opcode == 4 | opcode == 5) ;
+        ACC_MEM = (opcode == 5) ;
+        STO = (opcode == 6) ;
+        HALT = (opcode == 0) ;
+        JMP = (opcode == 7) ;
+        SKZ = (opcode == 1) ;
+    end
+    
+    always_ff @(posedge clk or posedge rst) begin
+    if (rst)
+        state <= s0;      // reset về FETCH
+    else
+        state <= nextstate;
+    end
+    
     always_comb begin
     if (rst) begin
         pc_load = 0; pc_en = 0; halt = 0; jmp = 0;
@@ -58,8 +60,8 @@ end
     end else begin
         case (state)
             s1: begin // FETCH
-					 pc_load = (opcode === 3'bxxx) ? 0 : (JMP | (SKZ & is_zero));
-                pc_en = 1; halt = 0; jmp = JMP;
+					 pc_load = 0;
+                pc_en = 0; halt = 0; jmp = JMP;
                 accumulator_control = 0; accumulator_load = 0;
                 memIns_en = 1; memDa_en = 0; memDa_we = 0;
             end
@@ -74,7 +76,7 @@ end
                 memIns_en = 0; memDa_en = 0; memDa_we = 0;
             end
             s4: begin // WRITEBACK
-                pc_load = 0; pc_en = 0; halt = HALT; jmp = JMP;
+                pc_load = (JMP | (SKZ & is_zero)); pc_en = 1; halt = HALT; jmp = JMP;
                 accumulator_control = ACC_MEM;
                 accumulator_load = ACC_LOAD;
                 memIns_en = 0; memDa_en = 1; memDa_we = STO;
