@@ -1,6 +1,6 @@
 module MEM (
     input  logic       clk,    
-    input  logic       en,     
+    input  logic       re,     
     input  logic       we,    
     input  logic [4:0] addr,   
     input  logic [7:0] din,    
@@ -11,14 +11,11 @@ module MEM (
     logic [7:0] mem [0:31];
 
     always_ff @(posedge clk) begin
-        if (en) begin
-            if (we) begin
-                mem[addr] <= din;
-            end else begin
-                dout <= mem[addr];
-            end
+        if (we) begin
+            mem[addr] <= din;
         end
     end
 
-endmodule
+    assign dout = re ? mem[addr] : 8'bz;
 
+endmodule
