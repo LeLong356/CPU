@@ -2,12 +2,11 @@ module ALU (
     input logic [7:0] rs1, rs2,
     input logic [2:0] opcode,
     output logic [7:0] rd,
-    output logic is_zero
+    output logic is_zero,
+    output logic flag
 );
     logic [7:0] lut [0:7];
     always_comb begin
-        begin
-            begin
                 is_zero = !(|rs1) ;
                 lut[0] = rs1;
                 lut[1] = rs1;
@@ -19,6 +18,4 @@ module ALU (
                 lut[7] = rs1;
                 rd = lut[opcode];
             end
-        end
-    end
 endmodule
